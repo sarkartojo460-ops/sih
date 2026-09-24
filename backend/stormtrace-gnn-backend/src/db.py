@@ -21,13 +21,19 @@ from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Session
 
 from config import settings
 
-engine = create_engine(
-    settings.database_url,
-    pool_size=5,
-    max_overflow=10,
-    pool_pre_ping=True,
-    pool_recycle=1800,
-)
+is_sqlite = settings.database_url.startswith("sqlite")
+connect_args = {"check_same_thread": False} if is_sqlite else {}
+engine_kwargs = {
+    "connect_args": connect_args,
+    "pool_pre_ping": not is_sqlite,
+}
+if not is_sqlite:
+    engine_kwargs.update({
+        "pool_size": 5,
+        "max_overflow": 10,
+        "pool_recycle": 1800,
+    })
+engine = create_engine(settings.database_url, **engine_kwargs)
 Base = declarative_base()
 SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
 

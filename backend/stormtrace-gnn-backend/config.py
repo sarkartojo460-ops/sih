@@ -11,7 +11,7 @@ from pydantic import Field
 class Settings(BaseSettings):
     # --- storage ---
     database_url: str = Field(
-        default="postgresql://stormtrace:stormtrace@localhost:5432/stormtrace",
+        default="sqlite:///./stormtrace.db",
         alias="DATABASE_URL",
     )
     data_dir: str = "data"
